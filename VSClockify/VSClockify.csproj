@@ -60,6 +60,9 @@
     <Compile Include="ClockifyWindowControl.xaml.cs">
       <DependentUpon>ClockifyWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Log4netLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -111,6 +114,7 @@
     <Resource Include="Resources\clockify_logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Content Include="Resources\Loading10.GIF" />
     <Content Include="stylesheet.css" />
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +247,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="ClockifyWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoadingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
