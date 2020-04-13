@@ -46,18 +46,18 @@ namespace VSClockify
                 this.InitializeComponent();
                 this._clockifyService = new ClockyifyService();
                 textBox_apiKey.Text = ServiceUtility.ClockifyApiKey;
-                if (textBox_apiKey.Text.Length == 0)
-                {
-                    // TimerPanel.Visibility = Visibility.Hidden;
-                }
-                else
+                if (textBox_apiKey.Text.Length > 0)
                 {
                     loadClockifyData();
+                }else
+                {
+                    TimerPanel.Visibility = Visibility.Hidden;
                 }
+                
             }
             catch (Exception ex)
             {
-                MethodLogger.SaveLogToFile("ClockifyWindowControl exception:"+ex.Message);
+                MethodLogger.SaveLogToFile("ClockifyWindowControl exception:" + ex.Message);
                 MethodLogger.SaveLogToFile("ClockifyWindowControl exception:" + ex.StackTrace);
             }
         }
@@ -174,7 +174,7 @@ namespace VSClockify
             if (!string.IsNullOrEmpty(_user?.id))
             {
                 labelTitle.Content = _user.name;
-                // TimerPanel.Visibility = Visibility.Visible;
+                TimerPanel.Visibility = Visibility.Visible;
                 // SetupPanel.Visibility = Visibility.Collapsed;
 
                 _projects = _clockifyService.GetProjects(workspaceId);
@@ -206,6 +206,11 @@ namespace VSClockify
                     
                     
                 }
+
+            }else
+            {
+                TimerPanel.Visibility = Visibility.Hidden;
+                
             }
         }
 
