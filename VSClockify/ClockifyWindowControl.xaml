@@ -5,55 +5,50 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"
              Foreground="{DynamicResource VsBrush.WindowText}"
-             mc:Ignorable="d"
-             d:DesignHeight="400" d:DesignWidth="300"
-             Name="MyToolWindow" Height="Auto" Width="Auto">
-    <Grid Height="300" VerticalAlignment="top">
+             mc:Ignorable="d" d:DesignWidth="300"
+             Name="MyToolWindow" Height="435" Width="Auto">
+    <Grid Height="auto" VerticalAlignment="top">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="15*"/>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <DockPanel x:Name="HeaderPanel"  VerticalAlignment="Stretch" Margin="0,0,0,0" Grid.ColumnSpan="3" >
+        <DockPanel x:Name="HeaderPanel"  VerticalAlignment="Top" Grid.ColumnSpan="3" Height="30" >
             <Image x:Name="image" HorizontalAlignment="Left"  Margin="4,3,0,0" VerticalAlignment="Top"  Source="pack://application:,,,/VSClockify;component/Resources/clockify_logo.png" Width="100"/>
             <Label x:Name="labelTitle" Content="" HorizontalAlignment="Right" Margin="1,3,14,0" VerticalAlignment="Top" FontWeight="Bold" HorizontalContentAlignment="Right" DockPanel.Dock="Right" Padding="5" />
         </DockPanel>
-        
-        <StackPanel x:Name="SetupPanel" Orientation="Vertical"  VerticalAlignment="Stretch" Margin="0,34,0,0" Grid.ColumnSpan="3" >
-            <Label x:Name="label1" Content="API Key" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium"/>
-            <TextBox x:Name="textBox_apiKey" Height="23" TextWrapping="Wrap" Margin="6,0,14,0"/>
-            <Button x:Name="buttonApply" Content="Apply" Margin="160,10,14,0" Height="28" Click="buttonApply_Click" Foreground="#FF255163" FontWeight="Bold" OpacityMask="#FF9E6767" Background="{x:Null}"/>
-        </StackPanel>
-        <StackPanel x:Name="TimerPanel" Orientation="Vertical" VerticalAlignment="Stretch" Margin="0,120,0,25" Grid.ColumnSpan="3">
-            <Label x:Name="label" Content="Description :" Margin="0,0,215,0" FontWeight="Bold" FontStyle="Italic" />
-            <TextBox x:Name="textBoxDesc" Height="23" TextWrapping="WrapWithOverflow" Text="Task Id: " Margin="6,0,14,0" RenderTransformOrigin="0.629,1.517" Padding="0,2,0,0"/>
-            <Label x:Name="label2" Content="Project :" Margin="0,4,0,0" Padding="5,5,5,0" ScrollViewer.CanContentScroll="True" FontStyle="Italic" FontWeight="Bold"/>
-            <ComboBox x:Name="comboBoxProject" Margin="6,10,14,0" Padding="6,4,5,3" SelectionChanged="comboBoxProject_SelectionChanged" IsSynchronizedWithCurrentItem="True"/>
-            <Button Content="Start Timer" Click="Timer_Click" Height="28" x:Name="buttonTimer" Margin="160,11,10,0" RenderTransformOrigin="0.5,0.5" Padding="0,1" FontWeight="Bold"  Foreground="#FF255163"  OpacityMask="#FF9E6767" Background="{x:Null}">
-                <!--<Button.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="Black" Offset="0"/>
-                        <GradientStop Color="#FF88B7C9" Offset="1"/>
-                        <GradientStop Color="#FF74D2DC" Offset="0.025"/>
-                    </LinearGradientBrush>
-                </Button.Background>
+        <Expander x:Name="expander"  Margin="0,20,0,0"  VerticalAlignment="Stretch" Grid.ColumnSpan="3" FlowDirection="RightToLeft" IsExpanded="True">
+            <StackPanel Height="Auto" Margin="0,0,1,0" Orientation="Vertical" VerticalAlignment="Stretch" FlowDirection="LeftToRight" x:Name="SetupPanel" >
+                <Label x:Name="label1" Content="API Key" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
+                <TextBox x:Name="textBox_apiKey" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
+                <Button x:Name="buttonApply" Content="Apply" Margin="160,5,10,0" Height="28" Click="buttonApply_Click" Foreground="#FF255163" FontWeight="Bold" OpacityMask="#FF9E6767" Background="{x:Null}"/>
 
-                <Button.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform/>
-                        <SkewTransform/>
-                        <RotateTransform/>
-                        <TranslateTransform X="-4"/>
-                    </TransformGroup>
-                </Button.RenderTransform>-->
-            </Button>
-        </StackPanel>
+            </StackPanel>
+
+        </Expander>
+        <Expander x:Name="ExpanderTimePanel"  Margin="0,130,0,-15" Grid.ColumnSpan="3" FlowDirection="RightToLeft" IsExpanded="True">
+            <StackPanel x:Name="TimerPanel" Orientation="Vertical" VerticalAlignment="Stretch" Margin="0,0,0,0" Grid.Column="2" FlowDirection="LeftToRight" Height="255">
+                <!--<Label x:Name="label" Content="Description :" Margin="0,0,215,0" FontWeight="Bold" FontStyle="Italic" />
+                <TextBox x:Name="textBoxDesc" Height="23" TextWrapping="WrapWithOverflow" Text="Task Id: " Margin="6,0,10,0" RenderTransformOrigin="0.629,1.517" Padding="0,2,0,0"/>-->
+                <Label x:Name="label2" Content="Project :" Margin="0" Padding="5,5,5,0" ScrollViewer.CanContentScroll="True" FontStyle="Italic" FontWeight="Bold"/>
+                <ComboBox x:Name="comboBoxProject" Margin="6,3,10,0" Padding="6,4,5,3" SelectionChanged="comboBoxProject_SelectionChanged" IsSynchronizedWithCurrentItem="True"/>
+                <Label x:Name="label3" Content="Description :" FontWeight="Bold" FontStyle="Italic"/>
+                <ComboBox x:Name="comboBoxDesc" Margin="6,5,9,0" IsEditable="True" ToolTip="Type task name" PreviewTextInput="comboBox_PreviewTextInput" PreviewKeyUp="comboBox_PreviewKeyUp" SelectionChanged="comboBoxDesc_SelectionChanged"/>
+                <!--<TextBlock Margin="7,0,9,0">           
+                <Hyperlink x:Name="lblLink" NavigateUri="" RequestNavigate="lblLink_RequestNavigate" >
+                    
+                </Hyperlink>        
+                </TextBlock>-->
+                <Button Content="Start Timer" Click="Timer_Click" Height="28" x:Name="buttonTimer" Margin="160,11,10,0" RenderTransformOrigin="0.5,0.5" Padding="0,1" FontWeight="Bold"  Foreground="#FF255163"  OpacityMask="#FF9E6767" Background="{x:Null}"/>
+            </StackPanel>
+        </Expander>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
             <VSClockify:LoadingControl Diameter="60" Color1="Green" Color2="Transparent" x:Name="UCLoadingControl"/>
             <!--<Image Source="pack://application:,,,/VSClockify;component/Resources/Loading10.GIF" Width="100" />-->
             <!--<Label Content="Loading..." VerticalAlignment="Center" FontSize="12" Margin="10,0,0,0"/>-->
         </StackPanel>
+
         <!--<ProgressBar x:Name="progressbar" HorizontalAlignment="Left" Height="10" Margin="85,315,0,-25" VerticalAlignment="Top" Width="100"/>-->
     </Grid>
 </UserControl>

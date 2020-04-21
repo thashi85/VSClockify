@@ -1,0 +1,21 @@
+﻿{
+  "searchText": "#Text#",
+  "$skip": 0,
+  "$top": 100,
+  "filters": {
+      "System.State": [
+      "Active",
+      "Proposed"     
+    ],
+    "System.AssignedTo": [
+      "#User#"
+    ]
+  },
+  "$orderBy": [
+    {
+      "field": "system.title",
+      "sortOrder": "ASC"
+    }
+  ],
+  "includeFacets": false
+}

@@ -8,8 +8,10 @@ namespace VSClockify
 {
     using Services;
     using Services.Models;
+    using Services.Models.Azure;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Controls;
@@ -51,7 +53,7 @@ namespace VSClockify
                     loadClockifyData();
                 }else
                 {
-                    TimerPanel.Visibility = Visibility.Hidden;
+                    ExpanderTimePanel.Visibility = Visibility.Hidden;
                 }
                 
             }
@@ -78,7 +80,7 @@ namespace VSClockify
                 {
                     MessageBox.Show("Please fill the Clockify API Key");
                 }
-                else if (textBoxDesc.Text.Length == 0)
+                else if (comboBoxDesc.Text.Length == 0)
                 {
                     MessageBox.Show("Please add description");
                 }
@@ -94,7 +96,7 @@ namespace VSClockify
                     var _res = _clockifyService.PostTimeEntry(workspaceId, new TimeEntryRequest()
                     {
                         start = DateTime.UtcNow,
-                        description = textBoxDesc.Text,
+                        description = comboBoxDesc.Text,
                         projectId = comboBoxProject.SelectedValue.ToString()
                     });
                     //progressbar.Value = 90;
@@ -174,7 +176,7 @@ namespace VSClockify
             if (!string.IsNullOrEmpty(_user?.id))
             {
                 labelTitle.Content = _user.name;
-                TimerPanel.Visibility = Visibility.Visible;
+                ExpanderTimePanel.Visibility = Visibility.Visible;
                 // SetupPanel.Visibility = Visibility.Collapsed;
 
                 _projects = _clockifyService.GetProjects(workspaceId);
@@ -209,7 +211,7 @@ namespace VSClockify
 
             }else
             {
-                TimerPanel.Visibility = Visibility.Hidden;
+                ExpanderTimePanel.Visibility = Visibility.Hidden;
                 
             }
         }
@@ -218,6 +220,52 @@ namespace VSClockify
         {
             if(comboBoxProject.SelectedValue!=null)
             ServiceUtility.ClockifyDefaultProject = comboBoxProject.SelectedValue.ToString();
+        }
+
+        private void comboBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            comboTxtChanged(sender, e.Text);
+        }
+
+        private void comboBox_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            comboTxtChanged(sender, "");
+        }
+
+        private void comboTxtChanged(object sender, string txt)
+        {
+            ComboBox cmb = (ComboBox)sender;
+            cmb.IsDropDownOpen = true;
+            var _txt = !string.IsNullOrEmpty(cmb.Text) ? cmb.Text : (!string.IsNullOrEmpty(txt) ? txt :"");
+            if (!string.IsNullOrEmpty(_txt) && _txt.Length>=3)
+            {
+                var res = (new AzureAPIService()).GetWorkItems(_txt, _user.name, _user.email);
+                if (res != null)
+                {
+                    cmb.ItemsSource = res;
+                    cmb.DisplayMemberPath = "Desc";
+                    cmb.SelectedValuePath = "Title";
+                }
+            }
+            
+        }
+
+        private void comboBoxDesc_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //ComboBox cmb = (ComboBox)sender;
+            //if (cmb.SelectedItem != null)
+            //{
+            //    lblLink.TargetName = (cmb.SelectedItem as WorkItem).Url;
+            //    lblLink.NavigateUri = new Uri((cmb.SelectedItem as WorkItem).Url);               
+            //    lblLink.Inlines.Clear();
+            //    lblLink.Inlines.Add(lblLink.TargetName);
+            //}
+        }
+
+        private void lblLink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

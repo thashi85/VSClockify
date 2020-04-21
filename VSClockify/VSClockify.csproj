@@ -70,8 +70,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Services\AzureAPIService.cs" />
     <Compile Include="Services\ClockyifyService.cs" />
     <Compile Include="MethodLogger.cs" />
+    <Compile Include="Services\Models\Azure\WorkItem.cs" />
     <Compile Include="Services\Models\Client.cs" />
     <Compile Include="Services\Models\ClocifyResource.cs" />
     <Compile Include="Services\Models\Enums.cs" />
@@ -104,6 +106,10 @@
     </VSCTCompile>
     <Content Include="index.html" />
     <Content Include="Resources\active.png" />
+    <Content Include="Resources\azure\workItemSearch.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\Clockify1.png" />
     <Resource Include="Resources\clockify.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

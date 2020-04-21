@@ -16,7 +16,7 @@ namespace VSClockify.Services
     public static class ServiceUtility
     {
         static Configuration _appConfig;
-
+        public static string AppFolderPath = System.IO.Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath);
         static string _appConfigPath= System.IO.Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath) + "\\app.config";
         public static Configuration AppConfig
         {
@@ -91,7 +91,40 @@ namespace VSClockify.Services
                 _appConfig.Save(ConfigurationSaveMode.Modified);
             }
         }
-        
+        public static string AzurePAT
+        {
+            get
+            {
+                return AppConfig.AppSettings.Settings["AzurePAT"]?.Value;
+            }
+            set
+            {
+
+                ExeConfigurationFileMap configMap = new ExeConfigurationFileMap();
+                configMap.ExeConfigFilename = @"" + _appConfigPath; // the path of the custom app.config
+                _appConfig = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
+                _appConfig.AppSettings.Settings.Remove("AzurePAT");
+                _appConfig.AppSettings.Settings.Add("AzurePAT", value);
+                _appConfig.Save(ConfigurationSaveMode.Modified);
+            }
+        }
+        public static string AzureAPIEndPoint
+        {
+            get
+            {
+                return AppConfig.AppSettings.Settings["AzureAPIEndPoint"]?.Value;
+            }
+            set
+            {
+
+                ExeConfigurationFileMap configMap = new ExeConfigurationFileMap();
+                configMap.ExeConfigFilename = @"" + _appConfigPath; // the path of the custom app.config
+                _appConfig = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
+                _appConfig.AppSettings.Settings.Remove("AzureAPIEndPoint");
+                _appConfig.AppSettings.Settings.Add("AzureAPIEndPoint", value);
+                _appConfig.Save(ConfigurationSaveMode.Modified);
+            }
+        }
         public static string SendWebRequest(string webMethod, string webMethodUrl, string postData)
         {
 
