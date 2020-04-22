@@ -15,7 +15,7 @@ namespace VSClockify.Services.Models.Azure
         public string Assignedto { get; set; }
         public string State { get; set; }
         public string Url { get; set; }
-       
+        public string Color { get; set; }
     }
     
 }

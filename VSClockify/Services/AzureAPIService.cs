@@ -31,12 +31,14 @@ namespace VSClockify.Services
             dynamic objs = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(result);
             if (objs!=null && objs["count"] >0  && objs["results"]!=null) 
             {
-                return ((Newtonsoft.Json.Linq.JArray)objs["results"]).Select(d => (dynamic)d).ToList().Select(s => new WorkItem()
+                return ((Newtonsoft.Json.Linq.JArray)objs["results"]).Select(d => (dynamic)d).ToList().Where(d => d["fields"]["system.workitemtype"].ToString()=="Task" || d["fields"]["system.workitemtype"].ToString() == "Bug").Select(s => new WorkItem()
                     {
                         Id = s["fields"]["system.id"].ToString(),
                         Url = s["url"].ToString(),
-                        Desc = s["fields"]["system.workitemtype"].ToString() + s["fields"]["system.id"].ToString() + ":" + s["fields"]["system.title"].ToString(),
-                        Title = "#" + s["fields"]["system.id"].ToString()+":"+s["fields"]["system.title"].ToString()
+                        Workitemtype= s["fields"]["system.workitemtype"].ToString(),
+                        Color = s["fields"]["system.workitemtype"].ToString()=="Task" ? "Green":"Purple",
+                        Desc ="#" + s["fields"]["system.id"].ToString() + " :" + s["fields"]["system.title"].ToString(),
+                        Title = "#" + s["fields"]["system.id"].ToString()+" :"+s["fields"]["system.title"].ToString()
                     
                 }).ToList();
             }

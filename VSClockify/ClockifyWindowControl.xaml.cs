@@ -48,12 +48,15 @@ namespace VSClockify
                 this.InitializeComponent();
                 this._clockifyService = new ClockyifyService();
                 textBox_apiKey.Text = ServiceUtility.ClockifyApiKey;
+                textBox_azurePAT.Text = ServiceUtility.AzurePAT;
+                textBox_azureUrl.Text = ServiceUtility.AzureAPIEndPoint;
                 if (textBox_apiKey.Text.Length > 0)
                 {
                     loadClockifyData();
                 }else
                 {
-                    ExpanderTimePanel.Visibility = Visibility.Hidden;
+                  //  ExpanderTimePanel.Visibility = Visibility.Hidden;
+                  TimerPanel.Visibility = Visibility.Hidden;
                 }
                 
             }
@@ -150,6 +153,9 @@ namespace VSClockify
                     //progressbar.Value = 15;
                     UCLoadingControl.Visibility = Visibility.Visible;
                     ServiceUtility.ClockifyApiKey = textBox_apiKey.Text;
+                    ServiceUtility.AzurePAT= textBox_azurePAT.Text;
+                    ServiceUtility.AzureAPIEndPoint= textBox_azureUrl.Text;
+
                     loadClockifyData();
                     UCLoadingControl.Visibility = Visibility.Hidden;
                     if (string.IsNullOrEmpty(_user?.id))
@@ -176,11 +182,12 @@ namespace VSClockify
             if (!string.IsNullOrEmpty(_user?.id))
             {
                 labelTitle.Content = _user.name;
-                ExpanderTimePanel.Visibility = Visibility.Visible;
+                // ExpanderTimePanel.Visibility = Visibility.Visible;
                 // SetupPanel.Visibility = Visibility.Collapsed;
+                TimerPanel.Visibility = Visibility.Visible;
 
                 _projects = _clockifyService.GetProjects(workspaceId);
-               // progressbar.Value = 80;
+                // progressbar.Value = 80;
                 if ((_projects?.Count ?? 0) >0)
                 {
                     comboBoxProject.Items.Clear();
@@ -211,8 +218,8 @@ namespace VSClockify
 
             }else
             {
-                ExpanderTimePanel.Visibility = Visibility.Hidden;
-                
+                //ExpanderTimePanel.Visibility = Visibility.Hidden;
+                TimerPanel.Visibility = Visibility.Hidden;
             }
         }
 
@@ -243,8 +250,8 @@ namespace VSClockify
                 if (res != null)
                 {
                     cmb.ItemsSource = res;
-                    cmb.DisplayMemberPath = "Desc";
-                    cmb.SelectedValuePath = "Title";
+                   // cmb.DisplayMemberPath = "Desc";
+                    //cmb.SelectedValuePath = "Desc";
                 }
             }
             
