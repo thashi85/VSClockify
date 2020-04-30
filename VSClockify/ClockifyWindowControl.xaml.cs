@@ -13,8 +13,10 @@ namespace VSClockify
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Linq;
 
     /// <summary>
     /// Interaction logic for ClockifyWindowControl.
@@ -22,6 +24,7 @@ namespace VSClockify
     public partial class ClockifyWindowControl : UserControl
     {
         private ClockyifyService _clockifyService;
+        private AzureAPIService _azureService;
         private string _apiKey;
         private User _user;
         private List<Project> _projects;
@@ -47,9 +50,12 @@ namespace VSClockify
                 //MethodLogger.SaveLogToFile("ClockifyWindowControl ClockifyApiUrl:" + ServiceUtility.ClockifyApiUrl);
                 this.InitializeComponent();
                 this._clockifyService = new ClockyifyService();
+                this._azureService = new AzureAPIService();
                 textBox_apiKey.Text = ServiceUtility.ClockifyApiKey;
                 textBox_azurePAT.Text = ServiceUtility.AzurePAT;
-                textBox_azureUrl.Text = ServiceUtility.AzureAPIEndPoint;
+                textBox_azureUrl.Text = ServiceUtility.AzureSearchAPIEndPoint;
+                textBox_azureApiUrl.Text = ServiceUtility.AzureAPIEndPoint;
+
                 if (textBox_apiKey.Text.Length > 0)
                 {
                     loadClockifyData();
@@ -132,9 +138,7 @@ namespace VSClockify
                 MethodLogger.SaveLogToFile("Timer_Click exception:" + ex.StackTrace);
             }
            
-            //MessageBox.Show(
-            // string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", textBox.Text),
-            // "ClockifyWindow");
+           
         }
 
         private void buttonApply_Click(object sender, RoutedEventArgs e)
@@ -154,7 +158,8 @@ namespace VSClockify
                     UCLoadingControl.Visibility = Visibility.Visible;
                     ServiceUtility.ClockifyApiKey = textBox_apiKey.Text;
                     ServiceUtility.AzurePAT= textBox_azurePAT.Text;
-                    ServiceUtility.AzureAPIEndPoint= textBox_azureUrl.Text;
+                    ServiceUtility.AzureSearchAPIEndPoint= textBox_azureUrl.Text;
+                    ServiceUtility.AzureAPIEndPoint = textBox_azureApiUrl.Text;
 
                     loadClockifyData();
                     UCLoadingControl.Visibility = Visibility.Hidden;
@@ -182,15 +187,16 @@ namespace VSClockify
             if (!string.IsNullOrEmpty(_user?.id))
             {
                 labelTitle.Content = _user.name;
-                // ExpanderTimePanel.Visibility = Visibility.Visible;
-                // SetupPanel.Visibility = Visibility.Collapsed;
+                ExpanderTimePanel.IsExpanded = false;
+                ExpanderTimeLog.IsExpanded = true;
+                expander.IsExpanded = false;
                 TimerPanel.Visibility = Visibility.Visible;
 
                 _projects = _clockifyService.GetProjects(workspaceId);
                 // progressbar.Value = 80;
                 if ((_projects?.Count ?? 0) >0)
                 {
-                    comboBoxProject.Items.Clear();
+                    //comboBoxProject.Items.Clear();
                     comboBoxProject.DisplayMemberPath = "name";
                     comboBoxProject.SelectedValuePath = "id";
 
@@ -212,14 +218,18 @@ namespace VSClockify
                         comboBoxProject.SelectedItem = _proj[0];
                         comboBoxProject.Text = _proj[0].name;
                     }
-                    
-                    
+                    LoadWeeklyTimeLog();
+
+
                 }
 
             }else
             {
                 //ExpanderTimePanel.Visibility = Visibility.Hidden;
-                TimerPanel.Visibility = Visibility.Hidden;
+                // TimerPanel.Visibility = Visibility.Hidden;
+                ExpanderTimePanel.IsExpanded = false;
+                ExpanderTimeLog.IsExpanded = false;
+                expander.IsExpanded = true;
             }
         }
 
@@ -246,7 +256,7 @@ namespace VSClockify
             var _txt = !string.IsNullOrEmpty(cmb.Text) ? cmb.Text : (!string.IsNullOrEmpty(txt) ? txt :"");
             if (!string.IsNullOrEmpty(_txt) && _txt.Length>=3)
             {
-                var res = (new AzureAPIService()).GetWorkItems(_txt, _user.name, _user.email);
+                var res = _azureService.GetWorkItems(_txt, _user.name, _user.email);
                 if (res != null)
                 {
                     cmb.ItemsSource = res;
@@ -273,6 +283,99 @@ namespace VSClockify
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void LoadWeeklyTimeLog()
+        {
+            lblStatus.Content = "";
+            DateTime baseDate = DateTime.Today;
+            var thisWeekStart = baseDate.AddDays(-(int)baseDate.DayOfWeek).AddDays(1);
+            var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
+            var _timeEntries = _clockifyService.GetTimeEntries(workspaceId, _user?.id, thisWeekStart.ToUniversalTime(),thisWeekEnd.ToUniversalTime());
+            if (_timeEntries != null)
+            {
+                _timeEntries.ForEach(i=> 
+                {
+                    if (!string.IsNullOrEmpty(i.description) && i.timeInterval.duration!=null)
+                    {
+                        var reg = @"#\d*";
+                        var matches = Regex.Match(i.description, reg);
+                        i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("#", "") : "";
+                        var d = i.timeInterval.duration.Replace("PT", "");
+                        var arr = d.Split('H');
+                        var h = 0.00;
+                        var m = 0.00;
+                        if (arr.Length > 0)
+                        {
+                            h = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
+                            arr = arr.Length > 1 ? arr[1].Split('M') : arr[0].Split('M');
+                            m = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
+
+                        }
+                        i.durationD = h + (m / 60.00);                        
+                    }
+                });
+                var workItems = _azureService.GetWorkItemDetail(_timeEntries.Where(s=>!string.IsNullOrEmpty(s.taskId)).Select(s => Int32.Parse(s.taskId)).Distinct().ToList());
+                if (workItems!=null)
+                {
+                    var res = new List<TimeEntryResult>();
+                    _timeEntries.GroupBy(t => t.taskId).ToList().ForEach((s) => 
+                    {
+                        var _itm = workItems.Where(w => w.Id == s.Key).FirstOrDefault();
+                        var _entries = _timeEntries.Where(t => t.taskId == s.Key).ToList();
+                        var _completed = Math.Round(_entries.Select(t => t.durationD).Sum(), 2);
+                        if (_itm!=null) {
+                            res.Add(new TimeEntryResult()
+                            {
+                                taskId = s.Key,                                
+                                description = _entries.Select(t => t.description).Max(),
+                                selected = !string.IsNullOrEmpty(s.Key) && _completed>0 && _completed != _itm.Completed,
+                                color=_itm.Color,
+
+                                durationD = _completed,
+                                completed = _itm.Completed.ToString(),
+                                estimate =_itm.Estimate,
+                                remaining= (_itm.Estimate- _completed).ToString(),
+
+                            });
+                        }
+                    });
+                    //ListTimeEntries.ItemsSource = dt;
+                    dataGrid1.ItemsSource = res;
+                }
+            }
+        }
+
+        private void buttonSync_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGrid1.ItemsSource!=null)
+            {
+                var count = 0;
+                foreach (var itm in dataGrid1.ItemsSource)
+                {
+                    var i = itm as TimeEntryResult;
+                    if (i!=null && i.selected && !string.IsNullOrEmpty(i.taskId) && i.durationD > 0)
+                    {
+                        var st = _azureService.PatchWorkItems(i.taskId, new List<WorkItemChange>()
+                        {
+                            new WorkItemChange() {op=Constants.ActionType.ADD,path=Constants.Attributes.CompletedHours,value=i.durationD.ToString() },
+                            new WorkItemChange() {op=Constants.ActionType.ADD,path=Constants.Attributes.RemainingHours,value=i.remaining.ToString() }
+                        });
+                        if (st)
+                        {
+                            count++;
+                        }
+                    }
+                }
+                LoadWeeklyTimeLog();
+                lblStatus.Content = count + " record/s has been updated";
+            }
+        }
+
+        private void buttonRefresh_Click(object sender, RoutedEventArgs e)
+        {
+           
+            LoadWeeklyTimeLog();
         }
     }
 }

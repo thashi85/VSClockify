@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}"
              Foreground="{DynamicResource VsBrush.WindowText}"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="300"  d:DesignHeight="600"
              Name="MyToolWindow" Height="Auto" Width="Auto">
     <Grid Height="auto" VerticalAlignment="top">
         <Grid.ColumnDefinitions>
@@ -13,40 +13,49 @@
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <DockPanel x:Name="HeaderPanel"  VerticalAlignment="Top" Grid.ColumnSpan="3" Height="30" >
             <Image x:Name="image" HorizontalAlignment="Left"  Margin="4,3,0,0" VerticalAlignment="Top"  Source="pack://application:,,,/VSClockify;component/Resources/clockify_logo.png" Width="100"/>
             <Label x:Name="labelTitle" Content="" HorizontalAlignment="Right" Margin="1,3,14,0" VerticalAlignment="Top" FontWeight="Bold" HorizontalContentAlignment="Right" DockPanel.Dock="Right" Padding="5" />
         </DockPanel>
-        <!--<Expander x:Name="expander"  Margin="0,20,0,0"  VerticalAlignment="Stretch" Grid.ColumnSpan="3" FlowDirection="RightToLeft" IsExpanded="True">-->
-        <StackPanel Height="Auto" Margin="0,30,0,124" Orientation="Vertical" VerticalAlignment="Stretch" FlowDirection="LeftToRight" x:Name="SetupPanel" Grid.ColumnSpan="3" >
-            <Label x:Name="label1" Content="Clockify API Key:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
-            <TextBox x:Name="textBox_apiKey" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
-            <Label x:Name="labelAzurePAT" Content="Azure Personal Access Token(PAT):" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
-            <TextBox x:Name="textBox_azurePAT" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
-            <Label x:Name="labelAzureUrl" Content="Azure Item Search Url:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
-            <TextBox x:Name="textBox_azureUrl" Height="35" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
-            <Button x:Name="buttonApply" Content="Apply" Margin="160,5,10,0" Height="28" Click="buttonApply_Click" Foreground="#FF255163" FontWeight="Bold" OpacityMask="#FF9E6767" Background="{x:Null}"/>
+        <Expander x:Name="expander" Grid.Row="0" Margin="0,20,0,0"  VerticalAlignment="Stretch" Grid.ColumnSpan="3" FlowDirection="RightToLeft" Header="Settings" IsExpanded="True">
+            <!--Margin="0,30,0,124"-->
+            <StackPanel Height="Auto"  Orientation="Vertical" VerticalAlignment="Stretch" FlowDirection="LeftToRight" x:Name="SetupPanel" Grid.ColumnSpan="3" >
+                <Label x:Name="label1" Content="Clockify API Key:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
+                <TextBox x:Name="textBox_apiKey" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
+                <Label x:Name="labelAzurePAT" Content="Azure Personal Access Token(PAT):" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
+                <TextBox x:Name="textBox_azurePAT" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
+                <Label x:Name="labelAzureUrl" Content="Azure Item Search Url:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
+                <TextBox x:Name="textBox_azureUrl" Height="35" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
+                <Label x:Name="labelAzureAPIUrl" Content="Azure API Url:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
+                <TextBox x:Name="textBox_azureApiUrl" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
+                <Button x:Name="buttonApply" Content="Apply" Margin="160,5,10,0" Height="28" Click="buttonApply_Click" Foreground="#FF255163" FontWeight="Bold" OpacityMask="#FF9E6767" Background="{x:Null}"/>
 
-        </StackPanel>
+            </StackPanel>
 
-        <!--</Expander>-->
-        <!--<Expander x:Name="ExpanderTimePanel"  Margin="0,190,0,0" Grid.ColumnSpan="3" FlowDirection="RightToLeft" IsExpanded="True">-->
-        <StackPanel x:Name="TimerPanel" Orientation="Vertical" VerticalAlignment="Stretch" Margin="0,250,0,0" FlowDirection="LeftToRight" Grid.ColumnSpan="3">
-            <!--<Label x:Name="label" Content="Description :" Margin="0,0,215,0" FontWeight="Bold" FontStyle="Italic" />
+        </Expander>
+        <Expander x:Name="ExpanderTimePanel" Grid.Row="1" Margin="0,0,0,0"
+                  FlowDirection="RightToLeft" IsExpanded="False" Header="Timer" VerticalAlignment="Bottom" Grid.ColumnSpan="3">
+            <StackPanel x:Name="TimerPanel" Orientation="Vertical" VerticalAlignment="Stretch" Margin="0,0,0,0" FlowDirection="LeftToRight" Grid.ColumnSpan="3">
+                <!--<Label x:Name="label" Content="Description :" Margin="0,0,215,0" FontWeight="Bold" FontStyle="Italic" />
                 <TextBox x:Name="textBoxDesc" Height="23" TextWrapping="WrapWithOverflow" Text="Task Id: " Margin="6,0,10,0" RenderTransformOrigin="0.629,1.517" Padding="0,2,0,0"/>-->
-            <Label x:Name="label2" Content="Project :" Margin="0" Padding="5,5,5,0" ScrollViewer.CanContentScroll="True" FontStyle="Italic" FontWeight="Bold"/>
-            <ComboBox x:Name="comboBoxProject" Margin="6,3,10,0" Padding="6,4,5,3" SelectionChanged="comboBoxProject_SelectionChanged" IsSynchronizedWithCurrentItem="True"/>
-            <Label x:Name="label3" Content="Description :" FontWeight="Bold" FontStyle="Italic"/>
-            <ComboBox x:Name="comboBoxDesc" Margin="6,5,9,0" IsEditable="True" ToolTip="Type task name" PreviewTextInput="comboBox_PreviewTextInput" PreviewKeyUp="comboBox_PreviewKeyUp" SelectionChanged="comboBoxDesc_SelectionChanged">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <!--<Rectangle Fill="{Binding Name}" Width="16" Height="16" Margin="0,2,5,2" />-->
-                            <TextBlock Text="{Binding Title}" Foreground="{Binding Color}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-                <!--<Style TargetType="{x:Type ComboBoxItem}">
+                <Label x:Name="label2" Content="Project :" Margin="0" Padding="5,5,5,0" ScrollViewer.CanContentScroll="True" FontStyle="Italic" FontWeight="Bold"/>
+                <ComboBox x:Name="comboBoxProject" Margin="6,3,10,0" Padding="6,4,5,3" SelectionChanged="comboBoxProject_SelectionChanged" IsSynchronizedWithCurrentItem="True"/>
+                <Label x:Name="label3" Content="Description :" FontWeight="Bold" FontStyle="Italic"/>
+                <ComboBox x:Name="comboBoxDesc" Margin="6,5,9,0" IsEditable="True" ToolTip="Type task name" PreviewTextInput="comboBox_PreviewTextInput" PreviewKeyUp="comboBox_PreviewKeyUp" SelectionChanged="comboBoxDesc_SelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <!--<Rectangle Fill="{Binding Name}" Width="16" Height="16" Margin="0,2,5,2" />-->
+                                <TextBlock Text="{Binding Title}" Foreground="{Binding Color}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <!--<Style TargetType="{x:Type ComboBoxItem}">
                     <Setter Property="Foreground" Value="Blue" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding ElementName=Workitemtype}" Value="Task">                           
@@ -57,16 +66,86 @@
                         </DataTrigger>
                  </Style.Triggers>
                 </Style>-->
-            </ComboBox>
-            <!--<TextBlock Margin="7,0,9,0">           
+                </ComboBox>
+                <!--<TextBlock Margin="7,0,9,0">           
                 <Hyperlink x:Name="lblLink" NavigateUri="" RequestNavigate="lblLink_RequestNavigate" >
                     
                 </Hyperlink>        
                 </TextBlock>-->
-            <Button Content="Start Timer" Click="Timer_Click" Height="28" x:Name="buttonTimer" Margin="160,11,10,0" RenderTransformOrigin="0.5,0.5" Padding="0,1" FontWeight="Bold"  Foreground="#FF255163"  OpacityMask="#FF9E6767" Background="{x:Null}"/>
-        </StackPanel>
-        <!--</Expander>-->
-
+                <Button Content="Start Timer" Click="Timer_Click" Height="28" x:Name="buttonTimer" Margin="160,11,10,0" RenderTransformOrigin="0.5,0.5" Padding="0,1" FontWeight="Bold"  Foreground="#FF255163"  OpacityMask="#FF9E6767" Background="{x:Null}"/>
+            </StackPanel>
+        </Expander>
+        <Expander x:Name="ExpanderTimeLog" Grid.Row="2" Margin="0,0,0,0"                  
+                  FlowDirection="RightToLeft" IsExpanded="False" Header="Weekly Time Log" VerticalAlignment="Bottom" Grid.ColumnSpan="3">
+            <StackPanel x:Name="TimeLogPanel" Height="Auto" Orientation="Vertical" VerticalAlignment="Stretch" Margin="0,0,0,0" FlowDirection="LeftToRight" Grid.ColumnSpan="3">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"  MaxHeight="275" >
+               <DataGrid AutoGenerateColumns="False" SelectionMode="Extended" Height="Auto" HorizontalAlignment="Stretch" Name="dataGrid1" VerticalAlignment="Top" Width="Auto" >
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding selected}" Value="True">
+                                        <Setter Property="Background" Value="#FFAEBFC1"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding selected}" Value="False">
+                                        <Setter Property="Background" Value="White"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Resources>
+                            <Style x:Key="RightAligned" TargetType="DataGridCell">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                            </Style>
+                            
+                        </DataGrid.Resources>
+                        <DataGrid.Columns >
+                            <DataGridCheckBoxColumn MinWidth="15" Binding="{Binding Mode=TwoWay, Path=selected }" ></DataGridCheckBoxColumn>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Path=description}" MinWidth="50"  Foreground="{Binding color}" />
+                            <!--<DataGridTextColumn Header="Work Item Id" Binding="{Binding Path=taskId}" MinWidth="30"  CellStyle="{StaticResource RightAligned}"  />-->
+                            <DataGridTextColumn Header="Estimate" Binding="{Binding Path=estimate}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  />
+                            <DataGridTextColumn Header="Completed" Binding="{Binding Path=completed}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  />
+                            <DataGridTextColumn Header="Clockify Hrs" Binding="{Binding Path=durationD}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  />
+                            <DataGridTextColumn Header="Remaining" Binding="{Binding Path=remaining}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  IsReadOnly="False"/>
+                        </DataGrid.Columns>
+                       
+                    </DataGrid>
+                   <!--  <ListView x:Name="ListTimeEntries" > 
+                    
+                   <ListView.ItemTemplate>
+                        
+                       <DataTemplate >                                
+                                <DockPanel>                                   
+                                    
+                                    <Grid >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Content="{Binding description}" Grid.Column="0"></CheckBox>
+                                       
+                                        <TextBlock Grid.Column="1" Text="{Binding Path=taskId, StringFormat='   Id: {0}'}"></TextBlock>
+                                      
+                                        <TextBlock Grid.Column="2" FontWeight="Bold" Text="{Binding Path=durationD, StringFormat='   Duration: {0}'}"/>
+                                    </Grid>
+                                    
+                         </DockPanel>                       
+                    </DataTemplate>
+                    </ListView.ItemTemplate>
+                    </ListView>-->
+            
+            
+             </ScrollViewer>
+                <DockPanel Width="Auto" Grid.ColumnSpan="3">
+                    <Button Content="Sync" Height="28" x:Name="buttonSync"  RenderTransformOrigin="1.929,0.143" Padding="0,1" FontWeight="Bold"  Foreground="#FF255163"  OpacityMask="#FF9E6767" Background="{x:Null}" Click="buttonSync_Click" Width="150" Margin="0,10,0,0" />
+                    <Button Content="Refresh" Height="28" x:Name="buttonRefresh"  RenderTransformOrigin="0.5,0.5" Padding="0,1" FontWeight="Bold"  Foreground="#FF255163"  OpacityMask="#FF9E6767" Background="{x:Null}" Click="buttonRefresh_Click" Width="150" Margin="0,10,0,0"/>
+                </DockPanel>
+                <Label x:Name="lblStatus" ></Label>
+            </StackPanel>
+        </Expander>
+        
+        
+        
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
             <VSClockify:LoadingControl Diameter="60" Color1="Green" Color2="Transparent" x:Name="UCLoadingControl"/>
             <!--<Image Source="pack://application:,,,/VSClockify;component/Resources/Loading10.GIF" Width="100" />-->

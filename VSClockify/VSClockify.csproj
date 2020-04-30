@@ -74,8 +74,10 @@
     <Compile Include="Services\ClockyifyService.cs" />
     <Compile Include="MethodLogger.cs" />
     <Compile Include="Services\Models\Azure\WorkItem.cs" />
+    <Compile Include="Services\Models\Azure\WorkItemChange.cs" />
     <Compile Include="Services\Models\Client.cs" />
     <Compile Include="Services\Models\ClocifyResource.cs" />
+    <Compile Include="Services\Models\Constants.cs" />
     <Compile Include="Services\Models\Enums.cs" />
     <Compile Include="Services\Models\Project.cs" />
     <Compile Include="Services\Models\Task.cs" />
@@ -106,6 +108,10 @@
     </VSCTCompile>
     <Content Include="index.html" />
     <Content Include="Resources\active.png" />
+    <Content Include="Resources\azure\workItemDetails.txt">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\azure\workItemSearch.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

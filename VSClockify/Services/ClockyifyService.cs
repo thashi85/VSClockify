@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,6 +43,13 @@ namespace VSClockify.Services
             var status = 0;
             var result = ServiceUtility.WebAPIRequest(out status, ServiceUtility.ClockifyApiUrl, Enums.WebMethod.PATCH, "/workspaces/" + workspaceId + "/user/"+userId+"/time-entries", null, data, headers: new List<KeyValuePair<string, string>>() { AuthHeader });
             return Newtonsoft.Json.JsonConvert.DeserializeObject<TimeEntryResponse>(result);
+
+        }
+        public List<TimeEntryResponse> GetTimeEntries(string workspaceId,string userId,DateTime start,DateTime end)
+        {
+            var status = 0;
+            var result = ServiceUtility.WebAPIRequest(out status, ServiceUtility.ClockifyApiUrl, Enums.WebMethod.GET, "/workspaces/" + workspaceId + "/user/" + userId + "/time-entries?start="+start.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture)+"&end=" + end.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture), null, null, headers: new List<KeyValuePair<string, string>>() { AuthHeader });
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<TimeEntryResponse>>(result);
 
         }
     }

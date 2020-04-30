@@ -1,0 +1,11 @@
+﻿{
+  "ids": [#WorkItems# ],
+  "fields": [
+    "System.Id",
+    "System.Title",
+    "System.WorkItemType",
+    "Microsoft.VSTS.Scheduling.RemainingWork",
+    "Microsoft.VSTS.Scheduling.OriginalEstimate",
+    "Microsoft.VSTS.Scheduling.CompletedWork",
+  ]
+}

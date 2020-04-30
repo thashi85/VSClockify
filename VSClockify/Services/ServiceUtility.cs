@@ -108,6 +108,23 @@ namespace VSClockify.Services
                 _appConfig.Save(ConfigurationSaveMode.Modified);
             }
         }
+        public static string AzureSearchAPIEndPoint
+        {
+            get
+            {
+                return AppConfig.AppSettings.Settings["AzureSearchAPIEndPoint"]?.Value;
+            }
+            set
+            {
+
+                ExeConfigurationFileMap configMap = new ExeConfigurationFileMap();
+                configMap.ExeConfigFilename = @"" + _appConfigPath; // the path of the custom app.config
+                _appConfig = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
+                _appConfig.AppSettings.Settings.Remove("AzureSearchAPIEndPoint");
+                _appConfig.AppSettings.Settings.Add("AzureSearchAPIEndPoint", value);
+                _appConfig.Save(ConfigurationSaveMode.Modified);
+            }
+        }
         public static string AzureAPIEndPoint
         {
             get

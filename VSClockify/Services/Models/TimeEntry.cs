@@ -26,13 +26,26 @@ namespace VSClockify.Services.Models
         public string userId { get; set; }
         public string workspaceId { get; set; }
         public TimeInterval timeInterval { get; set; }
+
+        public double durationD { get; set; }
+
     }
+    public class TimeEntryResult : TimeEntryResponse
+    {
+        public string color { get; set; }
+        public bool selected { get; set; }
+        public double estimate { get; set; }
+        public string remaining { get; set; }
+        public string completed { get; set; }
+    }
+
 
     public class TimeInterval
     {
         public DateTime start { get; set; }
         public DateTime? end { get; set; }
-        public string duration { get; set; }
+        public string duration { get; set; } // (Example: PT1H30M15S - 1 hour 30 minutes 15 seconds)
+        
     }
     public class StopTimeEntryRequest
     {
