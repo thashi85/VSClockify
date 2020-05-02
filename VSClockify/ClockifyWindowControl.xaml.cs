@@ -35,8 +35,8 @@ namespace VSClockify
         private User _user;
         private List<Project> _projects;
         private bool _timerStart = false;
-        private DataModel mdl = new DataModel();
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("SpinnerVisibility", typeof(Visibility), typeof(ClockifyWindowControl));
+        //private DataModel mdl = new DataModel();
+        //public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("SpinnerVisibility", typeof(Visibility), typeof(ClockifyWindowControl));
 
         private string workspaceId
         {
@@ -47,7 +47,8 @@ namespace VSClockify
                 return "";
             }
         }
-       
+
+        public List<string> Statuses { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="ClockifyWindowControl"/> class.
         /// </summary>
@@ -61,7 +62,7 @@ namespace VSClockify
                 this.InitializeComponent();
 
                 // DataContext explains WPF in which object WPF has to check the binding path. Here Vis is in "this" then:
-                DataContext = mdl;
+                DataContext = this;
 
                 this._clockifyService = new ClockyifyService();
                 this._azureService = new AzureAPIService();
@@ -70,6 +71,7 @@ namespace VSClockify
                 textBox_azureUrl.Text = ServiceUtility.AzureSearchAPIEndPoint;
                 textBox_azureApiUrl.Text = ServiceUtility.AzureAPIEndPoint;
                 spinner.Icon = FontAwesomeIcon.Spinner;
+                Statuses = new List<string>() { "Proposed", "Active", "Resolved", "Closed" };
 
 
                 if (textBox_apiKey.Text.Length > 0)
@@ -258,11 +260,7 @@ namespace VSClockify
                 ExpanderTimeLog.IsExpanded = false;
                 expander.IsExpanded = true;
             }
-
-
             return true;
-
-
         }
 
         private void comboBoxProject_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -270,7 +268,6 @@ namespace VSClockify
             if (comboBoxProject.SelectedValue != null)
             {
                 ServiceUtility.ClockifyDefaultProject = comboBoxProject.SelectedValue.ToString();
-
             }
         }
 
@@ -310,17 +307,7 @@ namespace VSClockify
 
         private void comboBoxDesc_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ComboBox cmb = (ComboBox)sender;
-            //if (cmb.SelectedItem != null)
-            //    cmb.Text = (cmb.SelectedItem as WorkItem).Title;
-
-            //if (cmb.SelectedItem != null)
-            //{
-            //    lblLink.TargetName = (cmb.SelectedItem as WorkItem).Url;
-            //    lblLink.NavigateUri = new Uri((cmb.SelectedItem as WorkItem).Url);               
-            //    lblLink.Inlines.Clear();
-            //    lblLink.Inlines.Add(lblLink.TargetName);
-            //}
+            ComboBox cmb = (ComboBox)sender;            
         }
 
         private void lblLink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
@@ -385,6 +372,8 @@ namespace VSClockify
                                     durationD = _completed,
                                     completed = _itm.Completed.ToString(),
                                     estimate = _itm.Estimate,
+                                    state = _itm.State,
+                                    azureItem=_itm,
                                     remaining = (_completed!= _itm.Completed) ? Math.Round((_itm.Estimate - _completed), 2).ToString() :_itm.Remaining.ToString(),
 
                                 });
@@ -424,11 +413,16 @@ namespace VSClockify
                     var i = itm as TimeEntryResult;
                     if (i != null && i.selected && !string.IsNullOrEmpty(i.taskId) && i.durationD > 0)
                     {
-                        var st = _azureService.PatchWorkItems(i.taskId, new List<WorkItemChange>()
+                        var changes = new List<WorkItemChange>()
                         {
                             new WorkItemChange() {op=Constants.ActionType.ADD,path=Constants.Attributes.CompletedHours,value=i.durationD.ToString() },
                             new WorkItemChange() {op=Constants.ActionType.ADD,path=Constants.Attributes.RemainingHours,value=i.remaining.ToString() }
-                        });
+                        };
+                        if (i.state != i.azureItem.State)
+                        {
+                            changes.Add(new WorkItemChange() { op = Constants.ActionType.ADD, path = Constants.Attributes.State, value = i.state.ToString() });
+                        }
+                        var st = _azureService.PatchWorkItems(i.taskId, changes);
                         if (st)
                         {
                             count++;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VSClockify.Services.Models.Azure;
 
 namespace VSClockify.Services.Models
 {
@@ -37,6 +38,10 @@ namespace VSClockify.Services.Models
         public double estimate { get; set; }
         public string remaining { get; set; }
         public string completed { get; set; }
+        public string state { get; set; }
+
+        public WorkItem azureItem { get; set; }
+
     }
 
 

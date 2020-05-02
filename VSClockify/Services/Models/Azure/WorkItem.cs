@@ -20,6 +20,7 @@ namespace VSClockify.Services.Models.Azure
         public double Estimate { get; set; }
         public double Remaining { get; set; }
         public double Completed { get; set; }
+       
     }
 
     public class AzureWorkItem

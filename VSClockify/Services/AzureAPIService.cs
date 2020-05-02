@@ -80,8 +80,9 @@ namespace VSClockify.Services
                     Title = "#" + s["fields"]["System.Id"].ToString() + " :" + s["fields"]["System.Title"].ToString(),
                     Estimate = Convert.ToDouble((s["fields"]["Microsoft.VSTS.Scheduling.OriginalEstimate"]?? "0").ToString()),
                     Remaining = Convert.ToDouble((s["fields"]["Microsoft.VSTS.Scheduling.RemainingWork"]?? "0").ToString()),
-                    Completed = Convert.ToDouble((s["fields"]["Microsoft.VSTS.Scheduling.CompletedWork"]?? "0").ToString())
-
+                    Completed = Convert.ToDouble((s["fields"]["Microsoft.VSTS.Scheduling.CompletedWork"]?? "0").ToString()),
+                    State= s["fields"]["System.State"].ToString()
+                    
                 }).ToList();
             }
             return null;

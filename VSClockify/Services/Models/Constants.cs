@@ -17,6 +17,7 @@ namespace VSClockify.Services.Models
         {
             public const string CompletedHours = "/fields/Microsoft.VSTS.Scheduling.CompletedWork";
             public const string RemainingHours = "/fields/Microsoft.VSTS.Scheduling.RemainingWork";
+            public const string State = "/fields/System.State";
         }
     }
 }

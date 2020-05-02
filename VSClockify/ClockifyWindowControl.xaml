@@ -9,7 +9,7 @@
              Foreground="{DynamicResource VsBrush.WindowText}"
              mc:Ignorable="d" d:DesignWidth="300"  d:DesignHeight="600"
              Name="MyToolWindow" Height="Auto" Width="Auto"
-            
+           
             >
 
     
@@ -118,12 +118,24 @@
                         </DataGrid.Resources>
                         <DataGrid.Columns >
                             <DataGridCheckBoxColumn MinWidth="15" Binding="{Binding Mode=TwoWay, Path=selected }" ></DataGridCheckBoxColumn>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Path=description}" MinWidth="50"  Foreground="{Binding color}" />
+                            <DataGridTextColumn Header="Description" Binding="{Binding Path=description}" MinWidth="50"  Foreground="{Binding color}" IsReadOnly="True"/>
                             <!--<DataGridTextColumn Header="Work Item Id" Binding="{Binding Path=taskId}" MinWidth="30"  CellStyle="{StaticResource RightAligned}"  />-->
-                            <DataGridTextColumn Header="Estimate" Binding="{Binding Path=estimate}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  />
-                            <DataGridTextColumn Header="Completed" Binding="{Binding Path=completed}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  />
-                            <DataGridTextColumn Header="Clockify Hrs" Binding="{Binding Path=durationD}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  />
+                            <DataGridTextColumn Header="Estimate" Binding="{Binding Path=estimate}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  IsReadOnly="True" />
+                            <DataGridTextColumn Header="Completed" Binding="{Binding Path=completed}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  IsReadOnly="True" />
+                            <DataGridTextColumn Header="Clockify Hrs" Binding="{Binding Path=durationD}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  IsReadOnly="True" />
                             <DataGridTextColumn Header="Remaining" Binding="{Binding Path=remaining}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  IsReadOnly="False"/>
+                            <DataGridComboBoxColumn Header="State" SelectedItemBinding="{Binding Path=state}"  MinWidth="30">
+                                <DataGridComboBoxColumn.ElementStyle>
+                                    <Style TargetType="{x:Type ComboBox}">
+                                        <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Statuses, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                    </Style>
+                                </DataGridComboBoxColumn.ElementStyle>
+                                <DataGridComboBoxColumn.EditingElementStyle>
+                                    <Style TargetType="{x:Type ComboBox}">
+                                        <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Statuses, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                    </Style>
+                                </DataGridComboBoxColumn.EditingElementStyle>
+                            </DataGridComboBoxColumn>
                         </DataGrid.Columns>
                        
                     </DataGrid>
