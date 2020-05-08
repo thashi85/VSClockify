@@ -320,9 +320,12 @@ namespace VSClockify
         {
             lblStatus.Content = "";
             DateTime baseDate = DateTime.Today;
-            var thisWeekStart = baseDate.AddDays(-(int)baseDate.DayOfWeek).AddDays(1);
+            var noOfDt = (int)baseDate.DayOfWeek;
+            if (noOfDt == 0)
+                noOfDt = 7;
+            var thisWeekStart = baseDate.AddDays(-(noOfDt-1));
             var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
-            var _timeEntries = _clockifyService.GetTimeEntries(workspaceId, _user?.id, thisWeekStart.ToUniversalTime(), thisWeekEnd.ToUniversalTime());
+            var _timeEntries = _clockifyService.GetTimeEntries(workspaceId, _user?.id, thisWeekStart, thisWeekEnd);
             if (_timeEntries != null)
             {
                 _timeEntries.ForEach(i =>
