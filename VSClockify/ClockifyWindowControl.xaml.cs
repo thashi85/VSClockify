@@ -383,19 +383,23 @@ namespace VSClockify
                             }
                         }else
                         {
-                            res.Add(new TimeEntryResult()
+                            _entries.Where(t => t.taskId == s.Key).ToList().ForEach(tsk => 
                             {
-                                taskId = s.Key,
-                                description = _entries.Select(t => t.description).Max(),
-                               // selected = !string.IsNullOrEmpty(s.Key) && _completed > 0 && _completed != _itm.Completed,
-                               // color = _itm.Color,
+                                res.Add(new TimeEntryResult()
+                                {
+                                    taskId = tsk.taskId,
+                                    description = tsk.description,
+                                    // selected = !string.IsNullOrEmpty(s.Key) && _completed > 0 && _completed != _itm.Completed,
+                                    // color = _itm.Color,
 
-                                durationD = _completed,
-                                //completed = _itm.Completed.ToString(),
-                                //estimate = _itm.Estimate,
-                                //remaining = Math.Round((_itm.Estimate - _completed), 2).ToString(),
+                                    durationD = Math.Round(tsk.durationD, 2),
+                                    //completed = _itm.Completed.ToString(),
+                                    //estimate = _itm.Estimate,
+                                    //remaining = Math.Round((_itm.Estimate - _completed), 2).ToString(),
 
+                                });
                             });
+                            
                         }
                     });
                     //ListTimeEntries.ItemsSource = dt;
