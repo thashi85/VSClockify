@@ -246,6 +246,7 @@ namespace VSClockify
                         comboBoxProject.SelectedItem = _proj[0];
                         comboBoxProject.Text = _proj[0].name;
                     }
+                    setDate();
                     LoadWeeklyTimeLog();
 
 
@@ -315,80 +316,88 @@ namespace VSClockify
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
-
-        private void LoadWeeklyTimeLog()
+        private void setDate()
         {
-            lblStatus.Content = "";
             DateTime baseDate = DateTime.Today;
             var noOfDt = (int)baseDate.DayOfWeek;
             if (noOfDt == 0)
                 noOfDt = 7;
-            var thisWeekStart = baseDate.AddDays(-(noOfDt-1));
-            var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
-            var _timeEntries = _clockifyService.GetTimeEntries(workspaceId, _user?.id, thisWeekStart, thisWeekEnd);
-            if (_timeEntries != null)
+            dpStart.SelectedDate = baseDate.AddDays(-(noOfDt - 1));
+            dpEnd.SelectedDate = dpStart.SelectedDate.Value.AddDays(6);
+        }
+        private void LoadWeeklyTimeLog()
+        {
+            lblStatus.Content = "";
+            
+            var thisWeekStart =dpStart.SelectedDate;
+            var thisWeekEnd = dpEnd.SelectedDate;
+            if (thisWeekStart.HasValue && thisWeekEnd.HasValue)
             {
-                _timeEntries.ForEach(i =>
+                var _timeEntries = _clockifyService.GetTimeEntries(workspaceId, _user?.id, thisWeekStart.Value, thisWeekEnd.Value.AddHours(23).AddMinutes(59));
+                if (_timeEntries != null)
                 {
-                    if (!string.IsNullOrEmpty(i.description) && i.timeInterval.duration != null)
+                    _timeEntries.ForEach(i =>
                     {
-                        var reg = @"#\d*";
-                        var matches = Regex.Match(i.description, reg);
-                        i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("#", "") : "";
-                        var d = i.timeInterval.duration.Replace("PT", "");
-                        var arr = d.Split('H');
-                        var h = 0.00;
-                        var m = 0.00;
-                        var s = 0.00;
-                        if (arr.Length > 0)
+                        if (!string.IsNullOrEmpty(i.description) && i.timeInterval.duration != null)
                         {
-                            h = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
-                            arr = arr.Length > 1 ? arr[1].Split('M') : arr[0].Split('M');
-                            m = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
-                            arr = arr.Length > 1 ? arr[1].Split('S') : arr[0].Split('S');
-                            s = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
-
-                        }
-                        i.durationD = Math.Round((h + (m / 60.00) + (s / 3600.00)), 2);
-                    }
-                });
-                var workItems = _azureService.GetWorkItemDetail(_timeEntries.Where(s => !string.IsNullOrEmpty(s.taskId)).Select(s => Int32.Parse(s.taskId)).Distinct().ToList());
-                if (workItems != null)
-                {
-                    var res = new List<TimeEntryResult>();
-                    _timeEntries.GroupBy(t => t.taskId).ToList().ForEach((s) =>
-                    {
-                        var _entries = _timeEntries.Where(t => t.taskId == s.Key).ToList();
-                        var _completed = Math.Round(_entries.Select(t => t.durationD).Sum(), 2);
-                        if (!string.IsNullOrEmpty(s.Key))
-                        {
-                            var _itm = workItems.Where(w => w.Id == s.Key).FirstOrDefault();                           
-                            if (_itm != null)
+                            var reg = @"#\d*";
+                            var matches = Regex.Match(i.description, reg);
+                            i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("#", "") : "";
+                            var d = i.timeInterval.duration.Replace("PT", "");
+                            var arr = d.Split('H');
+                            var h = 0.00;
+                            var m = 0.00;
+                            var s = 0.00;
+                            if (arr.Length > 0)
                             {
-                                res.Add(new TimeEntryResult()
-                                {
-                                    taskId = s.Key,
-                                    description = _entries.Select(t => t.description).Max(),
-                                    selected = !string.IsNullOrEmpty(s.Key) && _completed > 0 && _completed != _itm.Completed,
-                                    color = _itm.Color,
+                                h = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
+                                arr = arr.Length > 1 ? arr[1].Split('M') : arr[0].Split('M');
+                                m = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
+                                arr = arr.Length > 1 ? arr[1].Split('S') : arr[0].Split('S');
+                                s = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
 
-                                    durationD = _completed,
-                                    completed = _itm.Completed.ToString(),
-                                    estimate = _itm.Estimate,
-                                    state = _itm.State,
-                                    azureItem=_itm,
-                                    remaining = (_completed!= _itm.Completed) ? Math.Round((_itm.Estimate - _completed), 2).ToString() :_itm.Remaining.ToString(),
-
-                                });
                             }
-                        }else
+                            i.durationD = Math.Round((h + (m / 60.00) + (s / 3600.00)), 2);
+                        }
+                    });
+                    var workItems = _azureService.GetWorkItemDetail(_timeEntries.Where(s => !string.IsNullOrEmpty(s.taskId)).Select(s => Int32.Parse(s.taskId)).Distinct().ToList());
+                    if (workItems != null)
+                    {
+                        var res = new List<TimeEntryResult>();
+                        _timeEntries.GroupBy(t => t.taskId).ToList().ForEach((s) =>
                         {
-                            _entries.Where(t => t.taskId == s.Key).ToList().ForEach(tsk => 
+                            var _entries = _timeEntries.Where(t => t.taskId == s.Key).ToList();
+                            var _completed = Math.Round(_entries.Select(t => t.durationD).Sum(), 2);
+                            if (!string.IsNullOrEmpty(s.Key))
                             {
-                                res.Add(new TimeEntryResult()
+                                var _itm = workItems.Where(w => w.Id == s.Key).FirstOrDefault();
+                                if (_itm != null)
                                 {
-                                    taskId = tsk.taskId,
-                                    description = tsk.description,
+                                    res.Add(new TimeEntryResult()
+                                    {
+                                        taskId = s.Key,
+                                        description = _entries.Select(t => t.description).Max(),
+                                        selected = !string.IsNullOrEmpty(s.Key) && _completed > 0 && _completed != _itm.Completed,
+                                        color = _itm.Color,
+
+                                        durationD = _completed,
+                                        completed = _itm.Completed.ToString(),
+                                        estimate = _itm.Estimate,
+                                        state = _itm.State,
+                                        azureItem = _itm,
+                                        remaining = (_completed != _itm.Completed) ? Math.Round((_itm.Estimate - _completed), 2).ToString() : _itm.Remaining.ToString(),
+
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                _entries.Where(t => t.taskId == s.Key).ToList().ForEach(tsk =>
+                                {
+                                    res.Add(new TimeEntryResult()
+                                    {
+                                        taskId = tsk.taskId,
+                                        description = tsk.description,
                                     // selected = !string.IsNullOrEmpty(s.Key) && _completed > 0 && _completed != _itm.Completed,
                                     // color = _itm.Color,
 
@@ -398,12 +407,14 @@ namespace VSClockify
                                     //remaining = Math.Round((_itm.Estimate - _completed), 2).ToString(),
 
                                 });
-                            });
-                            
-                        }
-                    });
-                    //ListTimeEntries.ItemsSource = dt;
-                    dataGrid1.ItemsSource = res;
+                                });
+
+                            }
+                        });
+                        //ListTimeEntries.ItemsSource = dt;
+                        dataGrid1.ItemsSource = res;
+                        lblTot.Content = "Total: " + Math.Round(res.Sum(r=>r.durationD),2);
+                    }
                 }
             }
         }

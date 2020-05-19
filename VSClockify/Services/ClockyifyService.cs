@@ -48,7 +48,7 @@ namespace VSClockify.Services
         public List<TimeEntryResponse> GetTimeEntries(string workspaceId,string userId,DateTime start,DateTime end)
         {
             var status = 0;
-            var result = ServiceUtility.WebAPIRequest(out status, ServiceUtility.ClockifyApiUrl, Enums.WebMethod.GET, "/workspaces/" + workspaceId + "/user/" + userId + "/time-entries?page-size=8000&start=" + start.ToString("yyyy-MM-ddThh:mm:ssZ", CultureInfo.InvariantCulture)+"&end=" + end.ToString("yyyy-MM-ddThh:mm:ssZ", CultureInfo.InvariantCulture), null, null, headers: new List<KeyValuePair<string, string>>() { AuthHeader });
+            var result = ServiceUtility.WebAPIRequest(out status, ServiceUtility.ClockifyApiUrl, Enums.WebMethod.GET, "/workspaces/" + workspaceId + "/user/" + userId + "/time-entries?page-size=8000&start=" + start.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)+"&end=" + end.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture), null, null, headers: new List<KeyValuePair<string, string>>() { AuthHeader });
             return Newtonsoft.Json.JsonConvert.DeserializeObject<List<TimeEntryResponse>>(result);
 
         }
