@@ -24,6 +24,13 @@ namespace VSClockify.Services
             return Newtonsoft.Json.JsonConvert.DeserializeObject<User>(result);
 
         }
+        public List<User> GetUsers(string workspaceId)
+        {
+            var status = 0;
+            var result = ServiceUtility.WebAPIRequest(out status, ServiceUtility.ClockifyApiUrl, Enums.WebMethod.GET, "/workspaces/" + workspaceId + "/users?page-size=500", null, null, headers: new List<KeyValuePair<string, string>>() { AuthHeader });
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<User>>(result);
+
+        }
         public List<Project> GetProjects(string workspaceId)
         {
             var status = 0;

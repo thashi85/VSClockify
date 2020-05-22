@@ -29,8 +29,8 @@ namespace VSClockify
     /// </summary>
     public partial class ClockifyWindowControl : UserControl
     {
-        private ClockyifyService _clockifyService;
-        private AzureAPIService _azureService;
+       // private ClockyifyService _clockifyService;
+       // private AzureAPIService _azureService;
         private string _apiKey;
         private User _user;
         private List<Project> _projects;
@@ -64,8 +64,8 @@ namespace VSClockify
                 // DataContext explains WPF in which object WPF has to check the binding path. Here Vis is in "this" then:
                 DataContext = this;
 
-                this._clockifyService = new ClockyifyService();
-                this._azureService = new AzureAPIService();
+               // this._clockifyService = new ClockyifyService();
+                //this._azureService = new AzureAPIService();
                 textBox_apiKey.Text = ServiceUtility.ClockifyApiKey;
                 textBox_azurePAT.Text = ServiceUtility.AzurePAT;
                 textBox_azureUrl.Text = ServiceUtility.AzureSearchAPIEndPoint;
@@ -121,7 +121,7 @@ namespace VSClockify
 
                     //progressbar.Value = 30;
 
-                    var _res = _clockifyService.PostTimeEntry(workspaceId, new TimeEntryRequest()
+                    var _res = ClockifyUtility.StartClockify(workspaceId, new TimeEntryRequest()
                     {
                         start = DateTime.UtcNow,
                         description = comboBoxDesc.Text,
@@ -136,7 +136,7 @@ namespace VSClockify
                 }
                 else
                 {
-                    var _res = _clockifyService.StopTimeEntry(workspaceId, _user.id, new StopTimeEntryRequest()
+                    var _res = ClockifyUtility.StopClockify(workspaceId, _user.id, new StopTimeEntryRequest()
                     {
                         end = DateTime.UtcNow
                     });
@@ -210,7 +210,7 @@ namespace VSClockify
         {
 
 
-            _user = _clockifyService.GetUser();
+            _user = ClockifyUtility.GetUser();
             //progressbar.Value = 45;
             if (!string.IsNullOrEmpty(_user?.id))
             {
@@ -220,7 +220,7 @@ namespace VSClockify
                 expander.IsExpanded = false;
                 TimerPanel.Visibility = Visibility.Visible;
 
-                _projects = _clockifyService.GetProjects(workspaceId);
+                _projects = ClockifyUtility.GetProjects(workspaceId);
                 // progressbar.Value = 80;
                 if ((_projects?.Count ?? 0) > 0)
                 {
@@ -295,7 +295,7 @@ namespace VSClockify
             var _txt = !string.IsNullOrEmpty(cmb.Text) ? cmb.Text : (!string.IsNullOrEmpty(txt) ? txt : "");
             if (!string.IsNullOrEmpty(_txt) && _txt.Length >= 3)
             {
-                var res = _azureService.GetWorkItems(_txt, _user.name, _user.email);
+                var res = ClockifyUtility.GetWorkItems(_txt, _user.name, _user.email);
                 if (res != null)
                 {
                     cmb.ItemsSource = res.OrderByDescending(a => Int32.Parse(a.Id)).ToList();
@@ -317,13 +317,9 @@ namespace VSClockify
             e.Handled = true;
         }
         private void setDate()
-        {
-            DateTime baseDate = DateTime.Today;
-            var noOfDt = (int)baseDate.DayOfWeek;
-            if (noOfDt == 0)
-                noOfDt = 7;
-            dpStart.SelectedDate = baseDate.AddDays(-(noOfDt - 1));
-            dpEnd.SelectedDate = dpStart.SelectedDate.Value.AddDays(6);
+        {          
+            dpStart.SelectedDate =ClockifyUtility.GetWeekStart();
+            dpEnd.SelectedDate = ClockifyUtility.GetWeekEnd();
         }
         private void LoadWeeklyTimeLog()
         {
@@ -333,89 +329,10 @@ namespace VSClockify
             var thisWeekEnd = dpEnd.SelectedDate;
             if (thisWeekStart.HasValue && thisWeekEnd.HasValue)
             {
-                var _timeEntries = _clockifyService.GetTimeEntries(workspaceId, _user?.id, thisWeekStart.Value, thisWeekEnd.Value.AddHours(23).AddMinutes(59));
-                if (_timeEntries != null)
-                {
-                    _timeEntries.ForEach(i =>
-                    {
-                        if (!string.IsNullOrEmpty(i.description) && i.timeInterval.duration != null)
-                        {
-                            var reg = @"#\d*";
-                            var matches = Regex.Match(i.description, reg);
-                            i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("#", "") : "";
-                            var d = i.timeInterval.duration.Replace("PT", "");
-                            var arr = d.Split('H');
-                            var h = 0.00;
-                            var m = 0.00;
-                            var s = 0.00;
-                            if (arr.Length > 0)
-                            {
-                                h = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
-                                arr = arr.Length > 1 ? arr[1].Split('M') : arr[0].Split('M');
-                                m = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
-                                arr = arr.Length > 1 ? arr[1].Split('S') : arr[0].Split('S');
-                                s = arr.Length > 1 ? Int32.Parse(arr[0]) : 0;
-
-                            }
-                            i.durationD = Math.Round((h + (m / 60.00) + (s / 3600.00)), 2);
-                        }
-                    });
-                    var workItems = _azureService.GetWorkItemDetail(_timeEntries.Where(s => !string.IsNullOrEmpty(s.taskId)).Select(s => Int32.Parse(s.taskId)).Distinct().ToList());
-                    if (workItems != null)
-                    {
-                        var res = new List<TimeEntryResult>();
-                        _timeEntries.GroupBy(t => t.taskId).ToList().ForEach((s) =>
-                        {
-                            var _entries = _timeEntries.Where(t => t.taskId == s.Key).ToList();
-                            var _completed = Math.Round(_entries.Select(t => t.durationD).Sum(), 2);
-                            if (!string.IsNullOrEmpty(s.Key))
-                            {
-                                var _itm = workItems.Where(w => w.Id == s.Key).FirstOrDefault();
-                                if (_itm != null)
-                                {
-                                    res.Add(new TimeEntryResult()
-                                    {
-                                        taskId = s.Key,
-                                        description = _entries.Select(t => t.description).Max(),
-                                        selected = !string.IsNullOrEmpty(s.Key) && _completed > 0 && _completed != _itm.Completed,
-                                        color = _itm.Color,
-
-                                        durationD = _completed,
-                                        completed = _itm.Completed.ToString(),
-                                        estimate = _itm.Estimate,
-                                        state = _itm.State,
-                                        azureItem = _itm,
-                                        remaining = (_completed != _itm.Completed) ? Math.Round((_itm.Estimate - _completed), 2).ToString() : _itm.Remaining.ToString(),
-
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                _entries.Where(t => t.taskId == s.Key).ToList().ForEach(tsk =>
-                                {
-                                    res.Add(new TimeEntryResult()
-                                    {
-                                        taskId = tsk.taskId,
-                                        description = tsk.description,
-                                    // selected = !string.IsNullOrEmpty(s.Key) && _completed > 0 && _completed != _itm.Completed,
-                                    // color = _itm.Color,
-
-                                    durationD = Math.Round(tsk.durationD, 2),
-                                    //completed = _itm.Completed.ToString(),
-                                    //estimate = _itm.Estimate,
-                                    //remaining = Math.Round((_itm.Estimate - _completed), 2).ToString(),
-
-                                });
-                                });
-
-                            }
-                        });
-                        //ListTimeEntries.ItemsSource = dt;
-                        dataGrid1.ItemsSource = res;
-                        lblTot.Content = "Total: " + Math.Round(res.Sum(r=>r.durationD),2);
-                    }
-                }
+                //ListTimeEntries.ItemsSource = dt;
+                var res= ClockifyUtility.GetTimeEntries(workspaceId, _user.id, thisWeekStart.Value, thisWeekEnd.Value);
+                dataGrid1.ItemsSource = res;
+                lblTot.Content = "Total: " + Math.Round(res.Sum(r => r.durationD), 2);
             }
         }
 
@@ -440,7 +357,7 @@ namespace VSClockify
                         {
                             changes.Add(new WorkItemChange() { op = Constants.ActionType.ADD, path = Constants.Attributes.State, value = i.state.ToString() });
                         }
-                        var st = _azureService.PatchWorkItems(i.taskId, changes);
+                        var st = ClockifyUtility.PatchWorkItems(i.taskId, changes);
                         if (st)
                         {
                             count++;

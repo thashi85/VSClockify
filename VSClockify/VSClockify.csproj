@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Clockify.cs" />
     <Compile Include="ClockifyPackage.cs" />
+    <Compile Include="ClockifyUtility.cs" />
     <Compile Include="ClockifyWindow.cs" />
     <Compile Include="ClockifyWindowCommand.cs" />
     <Compile Include="ClockifyWindowControl.xaml.cs">
