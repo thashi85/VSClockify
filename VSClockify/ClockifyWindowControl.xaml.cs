@@ -23,6 +23,7 @@ namespace VSClockify
     using System.ComponentModel;
     using System.Windows.Threading;
     using System.Threading;
+    using System.Data;
 
     /// <summary>
     /// Interaction logic for ClockifyWindowControl.
@@ -176,14 +177,14 @@ namespace VSClockify
                 else
                 {
                     //progressbar.Value = 15;
-                    UCLoadingControl.Visibility = Visibility.Visible;
+                    //UCLoadingControl.Visibility = Visibility.Visible;
                     ServiceUtility.ClockifyApiKey = textBox_apiKey.Text;
                     ServiceUtility.AzurePAT = textBox_azurePAT.Text;
                     ServiceUtility.AzureSearchAPIEndPoint = textBox_azureUrl.Text;
                     ServiceUtility.AzureAPIEndPoint = textBox_azureApiUrl.Text;
 
                     var res = loadClockifyData().Result;
-                    UCLoadingControl.Visibility = Visibility.Hidden;
+                    //UCLoadingControl.Visibility = Visibility.Hidden;
                     if (string.IsNullOrEmpty(_user?.id))
                     {
                         MessageBox.Show("Invalild Clockify API Key");
@@ -386,6 +387,35 @@ namespace VSClockify
         }
         private void NotifyTargetUpdated(object sender, DataTransferEventArgs e)
         {
+        }
+        private void StatusSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            var selectedItem = this.dataGrid1.CurrentItem as TimeEntryResult;
+            if(comboBox!=null && selectedItem != null)
+            {
+                if ((comboBox.SelectedIndex == 3|| comboBox.SelectedIndex == 2) && selectedItem.remaining!="0")
+                {
+                    var ds = dataGrid1.ItemsSource;
+                    if (ds != null)
+                    {                       
+                        foreach (var itm in ds)
+                        {                          
+                            var i = itm as TimeEntryResult;
+                            if(i!=null && i.taskId== selectedItem.taskId && i.description==selectedItem.description)
+                            {
+                                i.remaining = "0";
+                                i.state = comboBox.SelectedValue.ToString();
+                                i.selected = true;
+                            }
+                           
+                        }
+                    }
+                    dataGrid1.ItemsSource = null;
+                    dataGrid1.ItemsSource=ds;                    
+                    //dataGrid1.Refresh();
+                }
+            }
         }
     }
 

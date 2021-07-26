@@ -42,10 +42,10 @@
                 <TextBox x:Name="textBox_apiKey" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
                 <Label x:Name="labelAzurePAT" Content="Azure Personal Access Token(PAT):" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
                 <TextBox x:Name="textBox_azurePAT" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
-                <Label x:Name="labelAzureUrl" Content="Azure Item Search Url:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
-                <TextBox x:Name="textBox_azureUrl" Height="35" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
-                <Label x:Name="labelAzureAPIUrl" Content="Azure API Url:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5"/>
-                <TextBox x:Name="textBox_azureApiUrl" Height="23" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto"/>
+                <Label x:Name="labelAzureUrl" Height="0" Content="Azure Item Search Url:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5" Visibility="Hidden"/>
+                <TextBox x:Name="textBox_azureUrl" Height="0" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto" Visibility="Hidden"/>
+                <Label x:Name="labelAzureAPIUrl" Height="0" Content="Azure API Url:" Margin="0,8,0,0" FontStyle="Italic" FontWeight="Medium" Padding="5,0,5,5" Visibility="Hidden"/>
+                <TextBox x:Name="textBox_azureApiUrl" Height="0" TextWrapping="Wrap" Margin="6,0,10,0" Width="auto" Visibility="Hidden"/>
                 <Button x:Name="buttonApply" Content="Apply" Margin="160,5,10,0" Height="28" Click="buttonApply_Click" Foreground="#FF255163" FontWeight="Bold" OpacityMask="#FF9E6767" Background="{x:Null}"/>
 
             </StackPanel>
@@ -127,7 +127,7 @@
                             <DataGridTextColumn Header="Estimate" Binding="{Binding Path=estimate}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  IsReadOnly="True" />
                             <DataGridTextColumn Header="Completed" Binding="{Binding Path=completed}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  IsReadOnly="True" />
                             <DataGridTextColumn Header="ClockifyHrs" Binding="{Binding Path=durationD}" MinWidth="30"  Foreground="{Binding color}"  CellStyle="{StaticResource RightAligned}"  IsReadOnly="True" />
-                            <DataGridTextColumn Header="Remaining" Binding="{Binding Path=remaining}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  IsReadOnly="False"/>
+                            <DataGridTextColumn Header="Remaining" Binding="{Binding Path=remaining,UpdateSourceTrigger=PropertyChanged}" MinWidth="30"  Foreground="{Binding color}" CellStyle="{StaticResource RightAligned}"  IsReadOnly="False"/>
                             <DataGridComboBoxColumn Header="State" SelectedItemBinding="{Binding Path=state}"  MinWidth="30">
                                 <DataGridComboBoxColumn.ElementStyle>
                                     <Style TargetType="{x:Type ComboBox}">
@@ -136,7 +136,9 @@
                                 </DataGridComboBoxColumn.ElementStyle>
                                 <DataGridComboBoxColumn.EditingElementStyle>
                                     <Style TargetType="{x:Type ComboBox}">
-                                        <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Statuses, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                        <EventSetter Event="SelectionChanged" Handler="StatusSelectionChanged" />
+                                        <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Statuses,UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+
                                     </Style>
                                 </DataGridComboBoxColumn.EditingElementStyle>
                             </DataGridComboBoxColumn>
@@ -182,7 +184,7 @@
         
         
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <VSClockify:LoadingControl Diameter="60" Color1="Green" Color2="Transparent" x:Name="UCLoadingControl"/>
+            <!--<VSClockify:LoadingControl Diameter="60" Color1="Green" Color2="Transparent" x:Name="UCLoadingControl"/>-->
             <!--<Image Source="pack://application:,,,/VSClockify;component/Resources/Loading10.GIF" Width="100" />-->
             <!--<Label Content="Loading..." VerticalAlignment="Center" FontSize="12" Margin="10,0,0,0"/>-->
         </StackPanel>

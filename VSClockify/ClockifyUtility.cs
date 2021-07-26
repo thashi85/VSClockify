@@ -106,7 +106,7 @@ namespace VSClockify
                     }
                 });
                 var workItems = _azureService.GetWorkItemDetail(_timeEntries.Where(s => !string.IsNullOrEmpty(s.taskId)).Select(s => Int32.Parse(s.taskId)).Distinct().ToList());
-                if (workItems != null)
+              //  if (workItems != null)
                 {
                    
                     _timeEntries.GroupBy(t => t.taskId).ToList().ForEach((s) =>
@@ -115,7 +115,7 @@ namespace VSClockify
                         var _completed = Math.Round(_entries.Select(t => t.durationD).Sum(), 2);
                         if (!string.IsNullOrEmpty(s.Key))
                         {
-                            var _itm = workItems.Where(w => w.Id == s.Key).FirstOrDefault();
+                            var _itm = workItems?.Where(w => w.Id == s.Key).FirstOrDefault();
                             if (_itm != null)
                             {
                                 res.Add(new TimeEntryResult()
