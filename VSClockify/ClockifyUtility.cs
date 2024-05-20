@@ -85,9 +85,26 @@ namespace VSClockify
                     i.taskId = "";
                     if (!string.IsNullOrEmpty(i.description) && i.timeInterval.duration != null)
                     {
-                        var reg = @"#\d*";
-                        var matches = Regex.Match(i.description, reg);
-                        i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("#", "") : "";
+                        //var reg = @"#\d*";
+                        //var matches = Regex.Match(i.description, reg);
+                        //i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("#", "") : "";
+
+                        var matches = Regex.Match(i.description.ToLower(), @"bug \d*");
+                        i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("bug ", "").Replace("Bug ", "") : "";
+
+                        if (string.IsNullOrEmpty(i.taskId))
+                        {
+                            matches = Regex.Match(i.description.ToLower(), @"task \d*");
+                            i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("Task ", "").Replace("task ", "") : "";
+                            if (string.IsNullOrEmpty(i.taskId))
+                            {
+                                var reg = @"#\s?\d*";
+                                matches = Regex.Match(i.description, reg);
+                                i.taskId = (matches != null && matches.Length > 0) ? matches.Value.Replace("# ", "").Replace("#", "") : "";
+                            }
+                        }
+
+
                         var d = i.timeInterval.duration.Replace("PT", "");
                         var arr = d.Split('H');
                         var h = 0.00;

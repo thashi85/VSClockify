@@ -15,7 +15,8 @@ namespace VSClockify.Services.Models
         }
         public static class Attributes
         {
-            public const string CompletedHours = "/fields/Microsoft.VSTS.Scheduling.CompletedWork";
+           // public const string CompletedHours = "/fields/Microsoft.VSTS.Scheduling.CompletedWork";
+            public const string CompletedHours = "/fields/Custom.ActualEffort";
             public const string RemainingHours = "/fields/Microsoft.VSTS.Scheduling.RemainingWork";
             public const string State = "/fields/System.State";
         }

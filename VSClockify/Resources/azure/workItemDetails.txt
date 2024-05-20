@@ -8,5 +8,6 @@
     "Microsoft.VSTS.Scheduling.RemainingWork",
     "Microsoft.VSTS.Scheduling.OriginalEstimate",
     "Microsoft.VSTS.Scheduling.CompletedWork",
+	"Custom.ActualEffort",
   ]
 }
